@@ -58,10 +58,10 @@ export default function LoginPage() {
 
   const fillTestCredentials = () => {
     setFormData({
-      email: 'demo@example.com',
-      password: 'demo123'
+      email: 'test@test.com',
+      password: 'password'
     })
-    toast('Demo credentials filled in!', {
+    toast('Test credentials filled in!', {
       icon: '📝',
       duration: 2000,
     })
@@ -98,7 +98,7 @@ export default function LoginPage() {
                 Fill test credentials
               </button>
               <div className="mt-2 text-xs text-blue-600">
-                Email: demo@example.com | Password: demo123
+                Email: test@test.com | Password: password
               </div>
             </div>
           </div>
