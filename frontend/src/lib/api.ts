@@ -658,23 +658,34 @@ const generateFallbackMindMap = (fileName: string, content: string): any => {
 const generatePodcastScript = async (fileName: string, summary: string): Promise<any> => {
   try {
     const docName = fileName.replace(/\.[^/.]+$/, "");
-    const prompt = `Create an engaging podcast script based on the following document summary. The document is titled "${fileName}".
+    const prompt = `Create an engaging CONVERSATIONAL PODCAST DIALOGUE between two AI personalities discussing the document "${fileName}".
 
 Document Summary:
 ${summary.substring(0, 2500)}
 
-Create a conversational, engaging podcast script that:
-1. Welcomes listeners to a personalized learning session
-2. Introduces the document and its main themes
-3. Walks through key concepts in an easy-to-understand way
-4. Provides practical applications and insights
-5. Ends with encouraging next steps
+Create a natural conversation between:
+- **ALEX** (Curious, asks questions, represents the learner's perspective)
+- **SAGE** (Knowledgeable, provides insights, explains concepts clearly)
 
-Make it sound natural and conversational, like a friendly teacher explaining the concepts. The script should be about 2-3 minutes when spoken (approximately 400-600 words).
+Format as a dialogue with:
+1. Natural back-and-forth conversation
+2. ALEX asking clarifying questions and showing curiosity
+3. SAGE providing clear explanations and insights
+4. Both discussing practical applications together
+5. Engaging, friendly tone throughout
+6. Occasional interruptions and "aha!" moments
+
+The conversation should be 3-4 minutes when spoken (500-700 words).
+
+Format exactly like this:
+ALEX: "Hey Sage! I just went through this document about [topic]. This is fascinating, but I'm curious about..."
+SAGE: "Great question, Alex! What's really interesting about this is..."
+ALEX: "Oh wow, that makes sense! But what about..."
+SAGE: "Exactly! And here's where it gets even more interesting..."
 
 Provide the response in this format:
-RAW_SCRIPT: [conversational script here]
-FORMATTED_SCRIPT: [same content with emoji headers and bullet points for visual appeal]`;
+RAW_SCRIPT: [full dialogue conversation with ALEX: and SAGE: speakers]
+FORMATTED_SCRIPT: [same dialogue with emoji speakers and visual formatting]`;
 
     const aiResponse = await callOpenAI(prompt, 1000);
     
@@ -701,14 +712,21 @@ FORMATTED_SCRIPT: [same content with emoji headers and bullet points for visual 
 };
 
 const formatScriptWithEmojis = (script: string, docName: string): string => {
-  return `🎧 **Welcome to your personalized learning session!**
+  // Format dialogue with emoji speakers
+  const formattedScript = script
+    .replace(/ALEX:/g, '\n🤔 **ALEX:**')
+    .replace(/SAGE:/g, '\n🧠 **SAGE:**')
+    .trim();
+  
+  return `🎧 **AI Learning Podcast: "${docName}"**
 
-Today we're exploring **"${docName}"** and its key insights.
+*A conversation between Alex (The Curious Learner) and Sage (The Wise Guide)*
 
-${script}
+${formattedScript}
 
-**Thank you for joining this learning session!** 🚀
-*Continue your learning journey by applying these concepts.*`;
+---
+**Thanks for tuning in to our AI Learning Podcast!** 🚀
+*Where curiosity meets wisdom to unlock new insights.*`;
 };
 
 const generateFallbackPodcastScript = (fileName: string, summary: string): any => {
@@ -716,17 +734,21 @@ const generateFallbackPodcastScript = (fileName: string, summary: string): any =
   const keyPoints = summaryLines.filter(line => line.includes('•') || line.includes('-')).slice(0, 5);
   const docName = fileName.replace(/\.[^/.]+$/, "");
   
-  const rawScript = `Welcome to your personalized learning session! Today we're exploring "${docName}" and diving deep into its key insights.
+  const rawScript = `ALEX: "Hey Sage! I just finished reading '${docName}' and wow, there's a lot to unpack here. Where should we even start?"
 
-This document offers valuable content for learning and understanding. The material presents interconnected concepts that build upon each other naturally.
+SAGE: "Great question, Alex! What I find most fascinating about this document is how it presents interconnected concepts that really build on each other naturally. What caught your attention first?"
 
-${keyPoints.length > 0 ? `Key takeaways include: ${keyPoints.slice(0, 3).map(point => point.replace(/[•-]/g, '').trim()).join(', ')}.` : 'The content covers important theoretical foundations and practical applications.'}
+ALEX: "Well, ${keyPoints.length > 0 ? `I noticed these key points: ${keyPoints.slice(0, 2).map(point => point.replace(/[•-]/g, '').trim()).join(' and ')}.` : 'the theoretical foundations seemed really solid, but I\'m curious about the practical applications.'} How do these actually connect to real-world scenarios?"
 
-What makes this particularly valuable is how these concepts connect to real-world scenarios. You can apply these insights directly to your own context and goals.
+SAGE: "Exactly what I was hoping you'd ask! These concepts are incredibly valuable because you can apply them directly to your own context and goals. Think about it this way..."
 
-As we wrap up, remember that the real power of this content comes from putting these ideas into practice. Take some time to reflect on how these concepts apply to your specific situation.
+ALEX: "Oh, that's a great perspective! So you're saying we can actually use these insights in our daily work?"
 
-Thank you for joining this learning session with "${docName}". I hope these insights serve you well!`;
+SAGE: "Absolutely! The real power comes from putting these ideas into practice. I always tell people to take some time and reflect on how these concepts apply to their specific situation."
+
+ALEX: "That makes so much sense. This has been really enlightening, Sage. Thanks for breaking down '${docName}' with me!"
+
+SAGE: "My pleasure, Alex! I hope our listeners found these insights as valuable as we did. Until next time, keep learning and applying!"`;
 
   const formattedScript = formatScriptWithEmojis(rawScript, docName);
   const wordCount = rawScript.split(/\s+/).length;
@@ -742,23 +764,33 @@ Thank you for joining this learning session with "${docName}". I hope these insi
 const generateAlternatePodcastScriptAI = async (fileName: string, summary: string): Promise<any> => {
   try {
     const docName = fileName.replace(/\.[^/.]+$/, "");
-    const prompt = `Create a fresh, alternative podcast script for the document "${fileName}" with a different perspective from the original.
+    const prompt = `Create a FOLLOW-UP CONVERSATIONAL PODCAST DIALOGUE between ALEX and SAGE about "${fileName}" with fresh perspectives.
 
 Document Summary:
 ${summary.substring(0, 2500)}
 
-Create a new script that:
+This is a second conversation that:
 1. Takes a different angle or approach to the same content
-2. Highlights aspects that might have been overlooked initially
-3. Provides alternative interpretations or applications
-4. Asks thought-provoking questions for deeper reflection
-5. Encourages synthesis with previous understanding
+2. ALEX brings up aspects they've been thinking about since the first discussion
+3. SAGE provides alternative interpretations and deeper insights
+4. Both explore "what if" scenarios and broader implications
+5. They reference their previous conversation naturally
 
-Make it conversational and engaging, like a follow-up discussion that adds new layers of understanding. Focus on "what if" scenarios and broader implications.
+Format as a natural dialogue between:
+- **ALEX** (Has been reflecting, brings new questions and connections)
+- **SAGE** (Offers deeper wisdom, alternative perspectives)
+
+Make it feel like a follow-up discussion between friends who've been thinking about the topic.
+
+Format exactly like this:
+ALEX: "Hey Sage! I've been thinking about our conversation about [topic], and something occurred to me..."
+SAGE: "Oh interesting, Alex! I'm curious what new connections you've made..."
+ALEX: "Well, what if we looked at this from a completely different angle..."
+SAGE: "That's brilliant! You know, that reminds me of something we didn't explore last time..."
 
 Provide the response in this format:
-RAW_SCRIPT: [conversational alternative script here]
-FORMATTED_SCRIPT: [same content with emoji headers and bullet points for visual appeal]`;
+RAW_SCRIPT: [full follow-up dialogue with ALEX: and SAGE: speakers]
+FORMATTED_SCRIPT: [same dialogue with emoji speakers and visual formatting]`;
 
     const aiResponse = await callOpenAI(prompt, 1000);
     
@@ -785,14 +817,21 @@ FORMATTED_SCRIPT: [same content with emoji headers and bullet points for visual 
 };
 
 const formatAlternativeScriptWithEmojis = (script: string, docName: string): string => {
-  return `🔄 **Welcome back for a fresh exploration!**
+  // Format dialogue with emoji speakers
+  const formattedScript = script
+    .replace(/ALEX:/g, '\n🤔 **ALEX:**')
+    .replace(/SAGE:/g, '\n🧠 **SAGE:**')
+    .trim();
+  
+  return `🔄 **AI Learning Podcast - Follow-Up Episode: "${docName}"**
 
-Today we're taking a **different approach** to "${docName}" with new perspectives.
+*Alex and Sage dive deeper with fresh perspectives and new insights*
 
-${script}
+${formattedScript}
 
-**Thank you for this deeper exploration!** 🌟
-*Each revisit reveals new dimensions and connections.*`;
+---
+**Thanks for joining us for this follow-up discussion!** 🌟
+*Where every revisit reveals new dimensions and connections.*`;
 };
 
 const generateAlternatePodcastScript = (fileName: string, summary: string): any => {
@@ -805,23 +844,25 @@ const generateAlternatePodcastScript = (fileName: string, summary: string): any 
   const topicMatches = summary.match(/\*\*(.*?)\*\*/g) || [];
   const alternativeTopics = topicMatches.slice(1, 5).map(match => match.replace(/\*\*/g, ''));
   
-  const rawScript = `Welcome back for a fresh exploration of "${docName}"! This time, we're taking a different approach to uncover new insights and perspectives.
+  const rawScript = `ALEX: "Hey Sage! I've been thinking about our last conversation on '${docName}', and I realized there might be angles we didn't fully explore. Mind diving deeper?"
 
-Sometimes the most valuable learning happens when we revisit material with fresh eyes. Today, I want to highlight aspects we might have glossed over in our first discussion.
+SAGE: "Absolutely, Alex! I love when we revisit material with fresh eyes. Sometimes the most valuable learning happens in these follow-up discussions. What's been on your mind?"
 
-${alternativeTopics.length > 0 ? `Let's start by examining ${alternativeTopics[0]} from a new angle. This concept might have seemed straightforward before, but there are deeper layers worth exploring.` : 'Looking at this content through a different lens reveals interesting patterns and connections.'}
+ALEX: "${alternativeTopics.length > 0 ? `Well, I keep coming back to ${alternativeTopics[0]}. At first, it seemed straightforward, but now I'm wondering if there are deeper layers we missed?` : 'I\'ve been looking at this content through a different lens, and I\'m seeing patterns and connections I didn\'t notice before.'}"
 
-${alternativeTopics.length > 1 ? `Another area worth revisiting is ${alternativeTopics[1]}. Notice how this connects to broader themes and implications we might not have fully appreciated initially.` : 'Each concept in this material has multiple facets that become clearer with reflection.'}
+SAGE: "That's exactly the kind of thinking I hoped you'd develop! ${alternativeTopics.length > 1 ? `And you know what? ${alternativeTopics[1]} connects to broader themes in ways we might not have fully appreciated initially.` : 'Each concept in this material has multiple facets that become clearer with reflection.'}"
 
-What's fascinating is how these ideas interconnect in ways that weren't immediately obvious. ${keyPoints.length > 0 ? `For instance, ${keyPoints[0]?.replace(/[•-]/g, '').trim()} takes on new significance when viewed in context.` : 'The relationships between concepts become more apparent with this deeper analysis.'}
+ALEX: "Oh wow, you're right! What's fascinating is how these ideas interconnect in ways that weren't immediately obvious. ${keyPoints.length > 0 ? `Like, ${keyPoints[0]?.replace(/[•-]/g, '').trim()} - it takes on completely new significance when viewed in this context!` : 'The relationships between concepts are becoming so much clearer now!'}"
 
-Let me pose some questions for reflection: How do these concepts challenge your existing assumptions? What new applications can you imagine? How might these ideas evolve in different contexts?
+SAGE: "Exactly! Let me pose some questions for our listeners to reflect on: How do these concepts challenge your existing assumptions? What new applications can you imagine? How might these ideas evolve in different contexts?"
 
-${alternativeTopics.length > 2 ? `The discussion around ${alternativeTopics[2]} is particularly thought-provoking when we consider its broader implications.` : 'This material continues to reveal new dimensions the more we engage with it.'}
+ALEX: "${alternativeTopics.length > 2 ? `And the discussion around ${alternativeTopics[2]} is particularly thought-provoking when we consider its broader implications, don't you think?` : 'This material just keeps revealing new dimensions the more we engage with it!'}"
 
-As we conclude this alternative exploration of "${docName}", I encourage you to synthesize these new perspectives with your original understanding. The richest learning often comes from holding multiple viewpoints simultaneously.
+SAGE: "I couldn't agree more, Alex. As we wrap up this deeper exploration of '${docName}', I encourage our listeners to synthesize these new perspectives with their original understanding. The richest learning comes from holding multiple viewpoints simultaneously."
 
-Thank you for this deeper dive. Remember, great content rewards multiple visits, each time revealing new treasures!`;
+ALEX: "Thanks for this incredible follow-up discussion, Sage! Great content really does reward multiple visits."
+
+SAGE: "My pleasure! Each time we dive in, we discover new treasures. Until our next deep dive, keep questioning and exploring!"`;
 
   const formattedScript = `🔄 **Welcome back for a fresh exploration!**
 
