@@ -53,25 +53,25 @@ CREATE TRIGGER update_documents_updated_at BEFORE UPDATE ON documents
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 
--- Users can only see their own data
+-- Users can only see their own data (optimized for performance)
 CREATE POLICY "Users can view own profile" ON users
-    FOR SELECT USING (auth.uid() = id);
+    FOR SELECT USING ((SELECT auth.uid()) = id);
 
 CREATE POLICY "Users can update own profile" ON users
-    FOR UPDATE USING (auth.uid() = id);
+    FOR UPDATE USING ((SELECT auth.uid()) = id);
 
--- Users can only see their own documents
+-- Users can only see their own documents (optimized for performance)
 CREATE POLICY "Users can view own documents" ON documents
-    FOR SELECT USING (auth.uid() = user_id);
+    FOR SELECT USING ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "Users can insert own documents" ON documents
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+    FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "Users can update own documents" ON documents
-    FOR UPDATE USING (auth.uid() = user_id);
+    FOR UPDATE USING ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "Users can delete own documents" ON documents
-    FOR DELETE USING (auth.uid() = user_id);
+    FOR DELETE USING ((SELECT auth.uid()) = user_id);
 
 -- Create storage bucket for documents (run this in Supabase dashboard)
 -- INSERT INTO storage.buckets (id, name, public)
