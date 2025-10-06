@@ -60,6 +60,9 @@ CREATE POLICY "Users can view own profile" ON users
 CREATE POLICY "Users can update own profile" ON users
     FOR UPDATE USING ((SELECT auth.uid()) = id);
 
+CREATE POLICY "Enable user registration" ON users
+    FOR INSERT WITH CHECK (true);
+
 -- Users can only see their own documents (optimized for performance)
 CREATE POLICY "Users can view own documents" ON documents
     FOR SELECT USING ((SELECT auth.uid()) = user_id);

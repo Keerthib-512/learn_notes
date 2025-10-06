@@ -4,6 +4,7 @@
 -- First, drop existing policies
 DROP POLICY IF EXISTS "Users can view own profile" ON public.users;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
+DROP POLICY IF EXISTS "Enable user registration" ON public.users;
 DROP POLICY IF EXISTS "Users can view own documents" ON public.documents;
 DROP POLICY IF EXISTS "Users can insert own documents" ON public.documents;
 DROP POLICY IF EXISTS "Users can update own documents" ON public.documents;
@@ -16,6 +17,9 @@ CREATE POLICY "Users can view own profile" ON public.users
 
 CREATE POLICY "Users can update own profile" ON public.users
     FOR UPDATE USING ((SELECT auth.uid()) = id);
+
+CREATE POLICY "Enable user registration" ON public.users
+    FOR INSERT WITH CHECK (true);
 
 -- Create optimized RLS policies for documents table
 -- Using (SELECT auth.uid()) instead of auth.uid() for better performance

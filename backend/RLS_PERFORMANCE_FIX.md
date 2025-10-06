@@ -1,14 +1,23 @@
-# Supabase RLS Performance Optimization Fix
+# Supabase RLS Issues Fix
 
-## Issue Description
-Supabase is showing a performance warning:
-> Table public.documents has a row level security policy Documents access policy - DELETE that re-evaluates current_setting() or auth.<function>() for each row. This produces suboptimal query performance at scale.
+## Issues Addressed
+1. **Performance Warning**: RLS policies re-evaluating auth functions for each row
+2. **Missing Policies**: Table public.users has RLS enabled but no/incomplete policies exist
 
-## Root Cause
-The issue occurs when RLS policies use `auth.uid()` directly instead of `(SELECT auth.uid())`. This causes Supabase to re-evaluate the auth function for every row, which is inefficient.
+## Issue Descriptions
+**Performance Issue:**
+> Table public.documents has a row level security policy that re-evaluates current_setting() or auth.<function>() for each row. This produces suboptimal query performance at scale.
 
-## Solution
-Replace all instances of `auth.uid()` with `(SELECT auth.uid())` in RLS policies to cache the result.
+**Missing Policies Issue:**
+> Table public.users has RLS enabled, but no policies exist (or incomplete policies)
+
+## Root Causes
+1. **Performance**: RLS policies using `auth.uid()` directly instead of `(SELECT auth.uid())`
+2. **Missing Policies**: Users table missing essential RLS policies (especially INSERT for registration)
+
+## Solutions Applied
+1. **Performance**: Replace `auth.uid()` with `(SELECT auth.uid())` to cache results
+2. **Missing Policies**: Add comprehensive RLS policies for all CRUD operations
 
 ## How to Fix
 
@@ -22,23 +31,40 @@ Replace all instances of `auth.uid()` with `(SELECT auth.uid())` in RLS policies
 Execute these SQL commands in your Supabase SQL Editor:
 
 ```sql
--- Drop existing policies
-DROP POLICY IF EXISTS "Users can delete own documents" ON public.documents;
+-- Fix missing users table policies
+CREATE POLICY "Users can view own profile" ON public.users
+    FOR SELECT USING ((SELECT auth.uid()) = id);
 
--- Recreate with optimized version
+CREATE POLICY "Users can update own profile" ON public.users
+    FOR UPDATE USING ((SELECT auth.uid()) = id);
+
+CREATE POLICY "Enable user registration" ON public.users
+    FOR INSERT WITH CHECK (true);
+
+-- Fix documents table policies (performance optimization)
+DROP POLICY IF EXISTS "Users can delete own documents" ON public.documents;
 CREATE POLICY "Users can delete own documents" ON public.documents
     FOR DELETE USING ((SELECT auth.uid()) = user_id);
 ```
 
 ## What Changed
+
+### Performance Optimization
 - **Before**: `auth.uid() = user_id` (re-evaluates for each row)
 - **After**: `(SELECT auth.uid()) = user_id` (caches the result)
 
-## Performance Impact
-- ✅ Eliminates function re-evaluation per row
-- ✅ Improves query performance at scale
-- ✅ Reduces database load
-- ✅ Maintains same security level
+### Missing Policies Added
+- **Users SELECT**: Allow users to view their own profile
+- **Users UPDATE**: Allow users to update their own profile  
+- **Users INSERT**: Allow user registration (essential for signup)
+
+## Benefits
+- ✅ **Performance**: Eliminates function re-evaluation per row
+- ✅ **Scalability**: Improves query performance at scale  
+- ✅ **Efficiency**: Reduces database load
+- ✅ **Security**: Maintains same security level
+- ✅ **Functionality**: Enables user registration and profile management
+- ✅ **Compliance**: Resolves Supabase RLS warnings
 
 ## Verification
 After applying the fix, you can verify the policies are correct by running:

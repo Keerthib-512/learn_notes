@@ -88,6 +88,9 @@ CREATE POLICY "Users can view own profile" ON public.users
 CREATE POLICY "Users can update own profile" ON public.users
     FOR UPDATE USING ((SELECT auth.uid()) = id);
 
+CREATE POLICY "Enable user registration" ON public.users
+    FOR INSERT WITH CHECK (true);
+
 -- Create RLS policies for documents table (optimized for performance)
 CREATE POLICY "Users can view own documents" ON public.documents
     FOR SELECT USING ((SELECT auth.uid()) = user_id);
